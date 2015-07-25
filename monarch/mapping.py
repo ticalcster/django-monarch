@@ -1,21 +1,11 @@
 # -*- coding: utf-8 -*-
-import urllib
-import urllib2
-import json
 from copy import copy
-
-from django.conf import settings
-from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import import_string
-from django.apps import apps
-from django.utils.module_loading import import_string, import_module
-
 
 from .exceptions import NoMapCreateMethodException, NoMapPKField
 from .models import RecordLink
 
-pathways = []
 
+pathways = []
 
 def pathway(have_model, need_model):
     """

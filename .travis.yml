@@ -6,6 +6,7 @@ python:
 env:
   - DJANGO=1.6.11 MIGRATE='true'
   - DJANGO=1.7.7 MIGRATE='python ./manage.py migrate'
+  - DJANGO=1.8.3 MIGRATE='python ./manage.py migrate'
 
 branches:
   only:

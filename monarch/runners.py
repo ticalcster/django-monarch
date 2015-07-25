@@ -1,6 +1,9 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import ImproperlyConfigured
-from django.utils.module_loading import import_string, import_module
+from django.utils.module_loading import import_module
+
+#django <= 1.6 import_by_path
+# django >= 1.7 import_string
 
 from .mapping import TableMap
 from .exceptions import NoMapPKField
