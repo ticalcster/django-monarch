@@ -7,15 +7,8 @@ from .models import RecordLink
 
 pathways = []
 
+
 def pathway(have_model, need_model):
-    """
-    Registers the pathyway in the list of usable pathways.
-
-    :param have_model: Model class that you have access to.
-    :param need_model: The Model class that you need to get to from the have_model.
-    :return: The decorated function.
-    """
-
     def pathway_decorator(func):
         pathways.append({'have': have_model, 'need': need_model, 'pathway': func})
 
@@ -137,4 +130,4 @@ class TableMap(object):
         return model
 
     def create_model(self):
-        raise NoMapCreateMethodException
+        raise NotImplementedError

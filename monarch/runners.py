@@ -8,6 +8,7 @@ from django.utils.module_loading import import_string, import_module
 from .mapping import TableMap
 from .exceptions import NoMapPKField
 
+
 class MigrationRunner(object):
     def __init__(self, settings=None, maps=None, cmd=None):
         self.settings = self._get_settings(settings)
@@ -16,7 +17,10 @@ class MigrationRunner(object):
         self._cmd = cmd
         self.maps = maps
         if not self.maps:
+            # Load all know maps if non are given
             self.maps = self._get_monarch_map_keys()
+
+        self._init_connectors(self.settings)
 
         # Runner Setup
         if self._cmd:
@@ -87,6 +91,7 @@ class MigrationRunner(object):
         return monarch_tables
 
     def _get_monarch_map_keys(self):
+        # TODO: is there a python builtin to do this?
         key_list = []
         for name in self.monarch_maps:
             key_list.append(name)
@@ -109,4 +114,8 @@ class MigrationRunner(object):
             raise ImproperlyConfigured('No CONNECTOR in default settings.')
         raise ImproperlyConfigured('No default monarch settings.')
 
-
+    def _init_connectors(self, settings):
+        connectors = {}
+        for connector in settings.itervalues():
+            class_ = import_string(connector['CONNECTOR'])
+            connector['connector'] = 'TEST'

@@ -111,9 +111,9 @@ TEMPLATE_DIRS = (
 MONARCH_RUNNER = 'monarch.runners.MigrationRunner'
 MONARCH_SETTINGS = {
     'default': {
-        'CONNECTOR': 'monarch.connectors.JSONConnector',
+        'CONNECTOR': 'monarch.connectors.HttpJsonConnector',
         'SETTINGS': {
-            'URL': 'https://localhost:8000/mock/monarch',
+            'URL': 'https://localhost:8000/json',
             'METHOD': 'GET',
             'DATA': {
                 'key': '123key321',

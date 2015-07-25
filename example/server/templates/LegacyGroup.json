@@ -1,0 +1,38 @@
+{
+  "rows": [
+    {
+      "GroupID": 2,
+      "GroupName": "Group One",
+      "Address": "123 Address",
+      "City": "GR Rap",
+      "State": "MI",
+      "Zip": "49000",
+      "Phone": "616-555-5555",
+      "Fax": "616-555-6666",
+      "Website": "http://www.example.com",
+      "LiveScanAgencyID": null,
+      "MaxDistricts": 5,
+      "FingTransfer": false,
+      "FingRouteISD": false,
+      "GroupDistricts": false,
+      "ControllingEntityID": 194
+    },
+    {
+      "GroupID": 10,
+      "GroupName": "Group Two",
+      "Address": "321 Street",
+      "City": "Rentwood",
+      "State": "MI",
+      "Zip": "49512",
+      "Phone": "616-555-0002",
+      "Fax": "616-666-0002",
+      "Website": "http://localhost/",
+      "LiveScanAgencyID": null,
+      "MaxDistricts": 5,
+      "FingTransfer": false,
+      "FingRouteISD": false,
+      "GroupDistricts": false,
+      "ControllingEntityID": 194
+    }
+  ]
+}
