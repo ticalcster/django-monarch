@@ -1,4 +1,4 @@
-from django.contrib.contenttypes.generic import GenericForeignKey  # django 1.9 need to be .fields
+from django.contrib.contenttypes.fields import GenericForeignKey  # django 1.6 need to be .generic
 from django.contrib.contenttypes.models import ContentType
 from django.db import models
 
