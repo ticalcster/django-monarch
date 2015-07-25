@@ -23,4 +23,4 @@ before_script:
   - pip freeze
 
 script:
-  - cd example && $MIGRATE && ./manage.py test server --settings=server.settings
+  - cd example && python $MIGRATE && python ./manage.py test server --settings=server.settings
