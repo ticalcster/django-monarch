@@ -5,7 +5,7 @@ python:
 
 env:
   - DJANGO=1.6.11 MIGRATE='true'
-  - DJANGO=1.7.7 MIGRATE='./manage.py migrate'
+  - DJANGO=1.7.7 MIGRATE='python ./manage.py migrate'
 
 branches:
   only:
@@ -16,11 +16,8 @@ install:
   - pip install -r example/requirements.txt
   - python setup.py -q install
 
-services:
-  - redis-server
-
 before_script:
   - pip freeze
 
 script:
-  - cd example && python $MIGRATE && python ./manage.py test server --settings=server.settings
+  - cd example && $MIGRATE && python ./manage.py test server --settings=server.settings
