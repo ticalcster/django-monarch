@@ -20,13 +20,13 @@ class MonarchRunnerTestCase(TestCase):
 
     def test_finding_apps_with_maps(self):
         runner = MigrationRunner()
-        apps_with_maps = runner.get_apps_with_maps()
-        self.assertIn('server', apps_with_maps)
-        self.assertNotIn('monarch', apps_with_maps)
+        self.assertIn('server', runner.apps_with_maps)
+        self.assertNotIn('monarch', runner.apps_with_maps)
 
     def test_finding_monarch_maps(self):
-        pass
-
+        runner = MigrationRunner()
+        self.assertIn('Entry', runner.monarch_maps)
+        self.assertNotIn('NotMonarchTable', runner.monarch_maps)
 
 
 class MonarchCommendTestCase(TestCase):
@@ -36,4 +36,4 @@ class MonarchCommendTestCase(TestCase):
     def test_command_output(self):
         out = StringIO()
         call_command('runmonarch', stdout=out)
-        self.assertIn('Setup monarch:', out.getvalue())
+        self.assertIn('Monarch setup:', out.getvalue())

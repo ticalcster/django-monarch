@@ -4,7 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 from django.utils.module_loading import import_string
 
-#from monarch.runner import Runner
+from monarch.runners import MigrationRunner
 
 class Command(BaseCommand):
     help = 'Import data from Manager.'
@@ -18,7 +18,5 @@ class Command(BaseCommand):
             raise ImproperlyConfigured('No Monarch settings found.')
         monarch_settings = settings.MONARCH_SETTINGS
 
-
-        self.stdout.write("Setup monarch:")
-        self.stdout.write("Complete")
+        runner = MigrationRunner(cmd=self)
 

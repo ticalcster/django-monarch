@@ -6,23 +6,22 @@ from .mapping import TableMap
 from .exceptions import NoMapPKField
 
 class MigrationRunner(object):
-    def __init__(self, settings=None, tables=None, cmd=None):
+    def __init__(self, settings=None, maps=None, cmd=None):
         self.settings = self._get_settings(settings)
-        self.cmd = cmd
-        self.maps = []
+        self.apps_with_maps = self._get_apps_with_maps()
+        self.monarch_maps = self._get_monarch_maps()
+        self._cmd = cmd
+        self.maps = maps
+        if not self.maps:
+            self.maps = self._get_monarch_map_keys()
 
         # Runner Setup
-        if self.cmd:
-            self.cmd.stdout.write(self.cmd.style.MIGRATE_HEADING("Monarch setup:"))
-
-        self.monarch_maps = self.load_monarch_maps()
-
-        if not self.maps:
-            self.maps = self.get_migration_model_list(self.monarch_maps)
-
-        if self.cmd:
-            self.cmd.stdout.write(self.cmd.style.MIGRATE_LABEL("  Run migrations for: "), ending=False)
-            self.cmd.stdout.write(", ".join(self.tables))
+        if self._cmd:
+            self._cmd.stdout.write(self._cmd.style.MIGRATE_HEADING("Monarch setup:"))
+            self._cmd.stdout.write(self._cmd.style.MIGRATE_LABEL("  Monarch tables loaded from: "), ending=False)
+            self._cmd.stdout.write(", ".join(self.apps_with_maps))
+            self._cmd.stdout.write(self._cmd.style.MIGRATE_LABEL("  Run migrations for: "), ending=False)
+            self._cmd.stdout.write(", ".join(self.maps))
 
     def run(self, connection=None):
         pass
@@ -66,7 +65,7 @@ class MigrationRunner(object):
         # if self.cmd:
         #     self.cmd.stdout.write(self.cmd.style.MIGRATE_HEADING("Should have done something awesome!"))
 
-    def get_apps_with_maps(self):
+    def _get_apps_with_maps(self):
         from django.apps import apps
         apps_with_maps = []
         for app_config in apps.get_app_configs():
@@ -77,23 +76,18 @@ class MigrationRunner(object):
                 pass
         return apps_with_maps
 
-    def load_monarch_maps(self):
-        apps_with_maps = self.get_apps_with_maps()
-
-        if self.cmd:
-            self.cmd.stdout.write(self.cmd.style.MIGRATE_LABEL("  Monarch tables loaded from: "), ending=False)
-            self.cmd.stdout.write(", ".join(apps_with_maps))
-
+    def _get_monarch_maps(self):
         monarch_tables = {}
         for class_ in TableMap.__subclasses__():
-            monarch_tables[class_.table_name] = class_
+            if class_.table_name:
+                monarch_tables[class_.table_name] = class_
         return monarch_tables
 
-    def get_migration_model_list(self, monarch_tables):
-        migration_list = []
-        for name in monarch_tables:
-            migration_list.append(name)
-        return migration_list
+    def _get_monarch_map_keys(self):
+        key_list = []
+        for name in self.monarch_maps:
+            key_list.append(name)
+        return key_list
 
     def _get_settings(self, monarch_settings):
         _settings = {}
