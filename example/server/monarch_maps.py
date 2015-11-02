@@ -9,7 +9,7 @@ class NotMonarchMap(object):
 
 
 class ErrorMap(mapping.TableMap):
-    #table_name = 'Error'
+    # table_name = 'Error'
     pass
 
 

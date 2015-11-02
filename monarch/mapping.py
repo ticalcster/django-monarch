@@ -4,7 +4,6 @@ from copy import copy
 from .exceptions import NoMapCreateMethodException, NoMapPKField
 from .models import RecordLink
 
-
 pathways = []
 
 
@@ -16,7 +15,7 @@ def pathway(have_model, need_model):
 
     return pathway_decorator
 
-
+e
 class FieldMap(object):
     def __init__(self, name, pk=False, converter=None, model_class=None, model_field=None):
         self.name = name
@@ -24,7 +23,7 @@ class FieldMap(object):
         self.converter = converter
         self.model_class = model_class
         self.model_field = None
-        self.value = None
+        slf.value = None
 
 
 class TableMap(object):
@@ -37,8 +36,6 @@ class TableMap(object):
 
     def __init__(self, row, cmd=None):
         # Error checking
-        if not self.table_name:
-            raise ValueError("No table_name defined.")
         if not self.model_class:
             raise ValueError("No model_class defined.")
         if len(row) == 0:
@@ -53,7 +50,7 @@ class TableMap(object):
             if isinstance(field, FieldMap):
                 if not field.model_field:
                     field.model_field = str(name)
-                instance_field =  copy(field)
+                instance_field = copy(field)
                 self.fields[field.name] = instance_field
 
                 if field.pk:
@@ -87,7 +84,7 @@ class TableMap(object):
         for field in self.fields.itervalues():
             if not field.pk:
                 if self.cmd:
-                        self.cmd.stdout.write(".", ending=False)
+                    self.cmd.stdout.write(".", ending=False)
                 if hasattr(self.model, field.model_field) and field.value:
                     setattr(self.model, field.model_field, field.value)
 
@@ -95,6 +92,12 @@ class TableMap(object):
 
         if self.cmd:
             self.cmd.stdout.write(self.cmd.style.MIGRATE_SUCCESS(" Saved"))
+
+    def get_table_name(self):
+        """
+        Returns the legacy systems table name.
+        """
+        return self.table_name
 
     def get_model(self):
         model = None
@@ -119,10 +122,10 @@ class TableMap(object):
         if self.cmd:
             self.cmd.stdout.write(
                 "  %(model)s (%(model_pk)s) : %(table)s (%(table_pk)s) " % {'model': model.__class__.__name__,
-                                                                           'model_pk': model.pk,
-                                                                           'table': self._pk_field,
-                                                                           'table_pk': self._pk_value,
-                                                                           },
+                                                                            'model_pk': model.pk,
+                                                                            'table': self._pk_field,
+                                                                            'table_pk': self._pk_value,
+                                                                            },
                 ending=False)
             if create_status:
                 self.cmd.stdout.write(create_status, ending=False)
