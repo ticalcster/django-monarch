@@ -1,6 +1,6 @@
-from monarch import mapping
+from monarch.mapping import field_map, TableMap
 
-import models
+from models import Group, Address
 
 
 class NotMonarchMap(object):
@@ -8,15 +8,26 @@ class NotMonarchMap(object):
     table_name = 'NotMonarchMap'
 
 
-class ErrorMap(mapping.TableMap):
+class ErrorMap(TableMap):
     # table_name = 'Error'
     pass
 
 
-class LegacyGroupMap(mapping.TableMap):
+class LegacyGroupMap(TableMap):
     table_name = 'LegacyGroup'
-    model_class = models.Group
+    model_class = Group
 
-    id = mapping.FieldMap('GroupID', pk=True)
-    name = mapping.FieldMap('GroupName')
-    website = mapping.FieldMap('Website')
+    fields = (
+        field_map('GroupID', pk=True, ),
+        field_map('GroupName', model_field='name'),
+        field_map('Website', model_field='website'),
+    )
+
+    def create_model(self):
+        address = Address(city='MI')
+        address.save()
+
+        obj = self.model_class()
+        obj.address = address
+        obj.save()
+        return obj
