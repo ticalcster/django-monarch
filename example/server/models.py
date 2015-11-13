@@ -55,7 +55,7 @@ class LegacyPosition(models.Model):
 class LegacyDistrict(models.Model):
     DistrictName = models.CharField(max_length=100)
     MaxDistricts = models.IntegerField()
-    positions = models.ManyToManyField(LegacyDistrictPosition, through='LegacyDistrictPosition')
+    positions = models.ManyToManyField('LegacyPosition', through='LegacyDistrictPosition')
     Address = models.CharField(max_length=50)
     City = models.CharField(max_length=25)
     State = models.CharField(max_length=2)
