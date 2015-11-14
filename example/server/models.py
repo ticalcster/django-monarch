@@ -14,6 +14,9 @@ class Group(models.Model):
     name = models.CharField(max_length=100)
     website = models.URLField(max_length=100)
 
+    def __unicode__(self):
+        return self.name
+
 
 class Position(models.Model):
     name = models.CharField(max_length=100)
@@ -45,14 +48,21 @@ class LegacyGroup(models.Model):
     State = models.CharField(max_length=2)
     Zip = models.CharField(max_length=10)
 
+    def __unicode__(self):
+        return self.GroupName
+
 
 class LegacyPosition(models.Model):
     PositionID = models.AutoField(primary_key=True)
     PositionName = models.CharField(max_length=100)
     Description = models.CharField(max_length=100)
 
+    def __unicode__(self):
+        return self.PositionName
+
 
 class LegacyDistrict(models.Model):
+    GroupID = models.ForeignKey(LegacyGroup)
     DistrictName = models.CharField(max_length=100)
     MaxDistricts = models.IntegerField()
     positions = models.ManyToManyField('LegacyPosition', through='LegacyDistrictPosition')
@@ -61,7 +71,13 @@ class LegacyDistrict(models.Model):
     State = models.CharField(max_length=2)
     Zip = models.CharField(max_length=10)
 
+    def __unicode__(self):
+        return self.DistrictName
+
 
 class LegacyDistrictPosition(models.Model):
     DistrictID = models.ForeignKey(LegacyDistrict)
     PositionID = models.ForeignKey(LegacyPosition)
+
+    def __unicode__(self):
+        return "%s - %s" % (self.DistrictID.DistrictName, self.PositionID.PositionName)

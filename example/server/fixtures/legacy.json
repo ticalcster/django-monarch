@@ -1,0 +1,43 @@
+[
+  {
+    "fields": {
+      "WebSite": "http://example.com/",
+      "City": "Grand Rapids",
+      "Zip": "49508",
+      "GroupName": "Group One",
+      "State": "MI",
+      "Address": "1 Group Street"
+    },
+    "model": "server.legacygroup",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "PositionName": "Sub Teacher",
+      "Description": "Standard"
+    },
+    "model": "server.legacyposition",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "City": "Grand Rapids",
+      "Zip": "49508",
+      "DistrictName": "District One",
+      "MaxDistricts": 5,
+      "State": "Mi",
+      "Address": "1 District Street",
+      "GroupID": 1
+    },
+    "model": "server.legacydistrict",
+    "pk": 1
+  },
+  {
+    "fields": {
+      "PositionID": 1,
+      "DistrictID": 1
+    },
+    "model": "server.legacydistrictposition",
+    "pk": 1
+  }
+]

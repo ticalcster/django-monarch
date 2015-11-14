@@ -22,10 +22,19 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Comment',
+            name='District',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('text', models.CharField(max_length=1000)),
+                ('name', models.CharField(max_length=100)),
+                ('max_districts', models.IntegerField()),
+                ('address', models.ForeignKey(to='server.Address')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='DistrictPosition',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('district', models.ForeignKey(to='server.District')),
             ],
         ),
         migrations.CreateModel(
@@ -38,11 +47,75 @@ class Migration(migrations.Migration):
             ],
         ),
         migrations.CreateModel(
-            name='Post',
+            name='LegacyDistrict',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('title', models.CharField(max_length=100)),
-                ('post_date', models.DateTimeField()),
+                ('DistrictName', models.CharField(max_length=100)),
+                ('MaxDistricts', models.IntegerField()),
+                ('Address', models.CharField(max_length=50)),
+                ('City', models.CharField(max_length=25)),
+                ('State', models.CharField(max_length=2)),
+                ('Zip', models.CharField(max_length=10)),
             ],
+        ),
+        migrations.CreateModel(
+            name='LegacyDistrictPosition',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('DistrictID', models.ForeignKey(to='server.LegacyDistrict')),
+            ],
+        ),
+        migrations.CreateModel(
+            name='LegacyGroup',
+            fields=[
+                ('GroupID', models.AutoField(serialize=False, primary_key=True)),
+                ('GroupName', models.CharField(max_length=100)),
+                ('WebSite', models.URLField(max_length=100)),
+                ('Address', models.CharField(max_length=50)),
+                ('City', models.CharField(max_length=25)),
+                ('State', models.CharField(max_length=2)),
+                ('Zip', models.CharField(max_length=10)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='LegacyPosition',
+            fields=[
+                ('PositionID', models.AutoField(serialize=False, primary_key=True)),
+                ('PositionName', models.CharField(max_length=100)),
+                ('Description', models.CharField(max_length=100)),
+            ],
+        ),
+        migrations.CreateModel(
+            name='Position',
+            fields=[
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('name', models.CharField(max_length=100)),
+                ('description', models.CharField(max_length=100)),
+            ],
+        ),
+        migrations.AddField(
+            model_name='legacydistrictposition',
+            name='PositionID',
+            field=models.ForeignKey(to='server.LegacyPosition'),
+        ),
+        migrations.AddField(
+            model_name='legacydistrict',
+            name='GroupID',
+            field=models.ForeignKey(to='server.LegacyGroup'),
+        ),
+        migrations.AddField(
+            model_name='legacydistrict',
+            name='positions',
+            field=models.ManyToManyField(to='server.LegacyPosition', through='server.LegacyDistrictPosition'),
+        ),
+        migrations.AddField(
+            model_name='districtposition',
+            name='position',
+            field=models.ForeignKey(to='server.Position'),
+        ),
+        migrations.AddField(
+            model_name='district',
+            name='positions',
+            field=models.ManyToManyField(to='server.Position', through='server.DistrictPosition'),
         ),
     ]
