@@ -115,11 +115,14 @@ class Migration(migrations.Migration):
         ),
         migrations.AddField(
             model_name='district',
+<<<<<<< HEAD
             name='group',
             field=models.ForeignKey(blank=True, to='server.Group', null=True),
         ),
         migrations.AddField(
             model_name='district',
+=======
+>>>>>>> b0b7fe41150205cb03c431c166e06846df517c38
             name='positions',
             field=models.ManyToManyField(to='server.Position', through='server.DistrictPosition'),
         ),

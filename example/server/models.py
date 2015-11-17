@@ -49,11 +49,17 @@ class LegacyGroup(models.Model):
     State = models.CharField(max_length=2)
     Zip = models.CharField(max_length=10)
 
+    def __unicode__(self):
+        return self.GroupName
+
 
 class LegacyPosition(models.Model):
     PositionID = models.AutoField(primary_key=True)
     PositionName = models.CharField(max_length=100)
     Description = models.CharField(max_length=100)
+
+    def __unicode__(self):
+        return self.PositionName
 
 
 class LegacyDistrict(models.Model):
@@ -67,7 +73,13 @@ class LegacyDistrict(models.Model):
     State = models.CharField(max_length=2)
     Zip = models.CharField(max_length=10)
 
+    def __unicode__(self):
+        return self.DistrictName
+
 
 class LegacyDistrictPosition(models.Model):
     DistrictID = models.ForeignKey(LegacyDistrict)
     PositionID = models.ForeignKey(LegacyPosition)
+
+    def __unicode__(self):
+        return "%s - %s" % (self.DistrictID.DistrictName, self.PositionID.PositionName)
