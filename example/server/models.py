@@ -22,6 +22,9 @@ class Position(models.Model):
     name = models.CharField(max_length=100)
     description = models.CharField(max_length=100)
 
+    def __unicode__(self):
+        return self.name
+
 
 class District(models.Model):
     group = models.ForeignKey(Group, blank=True, null=True)
@@ -30,11 +33,13 @@ class District(models.Model):
     max_districts = models.IntegerField()
     positions = models.ManyToManyField(Position, through='DistrictPosition')
 
+    def __unicode__(self):
+        return self.name
+
 
 class DistrictPosition(models.Model):
     district = models.ForeignKey(District)
     position = models.ForeignKey(Position)
-
 
 ##
 # Legacy Tables
