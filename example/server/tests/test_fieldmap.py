@@ -33,7 +33,7 @@ class MonarchFieldMapTests(TestCase):
         dummy_field = DummyFieldConvert(value='asdf')
         self.assertEqual(dummy_field.get_value(), 'ASDF')
 
-    def test_feild_map_factory(self):
+    def test_field_map_factory(self):
         GroupFieldMap = field_map('GroupID', model_field='id')
         self.assertEqual(GroupFieldMap.model_field, 'id')
 

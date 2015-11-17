@@ -4,16 +4,26 @@ from copy import copy
 from .exceptions import NoMapCreateMethodException, NoMapPKField
 from .models import RecordLink
 
-pathways = []
+pathways = {}
 
 
 def pathway(have_model, need_model):
     def pathway_decorator(func):
-        pathways.append({'have': have_model, 'need': need_model, 'pathway': func})
-
+        if have_model not in pathways:
+            pathways[have_model] = {}
+        if need_model not in pathways[have_model]:
+            pathways[have_model][need_model] = func
+        # pathways.append({'have': have_model, 'need': need_model, 'pathway': func})
         return func
 
     return pathway_decorator
+
+
+def get_pathway(have_model, need_model):
+    if have_model in pathways:
+        if need_model in pathways[have_model]:
+            return pathways[have_model][need_model]
+    raise IndexError('No pathway for %s to %s' % (have_model.__name__, need_model.__name__))
 
 
 class FieldMap(object):
@@ -54,8 +64,8 @@ class TableMap(object):
     model_class = None  #: Django's model class
     fields = ()  #: Tuple of fields to load
 
-    def __new__(cls, *args, **kwargs):
-        return super(TableMap, cls).__new__(cls, *args, **kwargs)
+    # def __new__(cls, *args, **kwargs):
+    #     return super(TableMap, cls).__new__(cls, *args, **kwargs)
 
     def __init__(self, row, cmd=None):
         self.cmd = cmd
@@ -63,7 +73,7 @@ class TableMap(object):
         # Error checking
         if not self.model_class:
             raise ValueError("No model_class defined.")
-        if len(self.fields):
+        if len(self.fields) == 0:
             raise ValueError("No fields defined.")
         if len(row) == 0:
             raise ValueError("Row has no fields.")
@@ -76,7 +86,7 @@ class TableMap(object):
         for field in self.fields:
             # if not field.model_field:
             #     field.model_field = str(field.name)
-            instance_field = copy(field)
+            instance_field = copy(field)(row.get(field.name, field.default))
 
             # add to pk list
             if field.pk:
@@ -87,19 +97,27 @@ class TableMap(object):
 
             # add to foreign key list
             if field.fk and field.foreign_map:
-                if field.foreign_map.table_name not in self.fk_fields.keys():
-                    self.fk_fields.update({field.foreign_map.table_name: []})
-                self.fk_fields.get(field.foreign_map.table_name).append(field)
+                fk_field_name = "%s-%s" % (field.foreign_map.table_name, field.model_field)
+                if fk_field_name not in self.fk_fields.keys():
+                    self.fk_fields.update({fk_field_name: []})
+                self.fk_fields.get(fk_field_name).append(instance_field)
 
             # add to local list
             if (not field.fk) and field.model_field:
                 dict_update = {instance_field.name: instance_field}
                 if field.model_class:
-                    self.local_fields.update(dict_update)
-                else:
                     self.foreign_fields.update(dict_update)
+                else:
+                    self.local_fields.update(dict_update)
 
+        print('------')
 
+        print('pk', self.pk_fields)
+        print('fk', self.fk_fields)
+        print('local', self.local_fields)
+        print('foreign', self.foreign_fields)
+
+        print('------')
 
         # for name, field in self.__class__.__dict__.iteritems():
         #     if isinstance(field, FieldMap):
@@ -136,14 +154,79 @@ class TableMap(object):
         self.model = self.get_model()
 
     def migrate(self):
-        for field in self.fields.itervalues():
-            if not field.pk:
-                if self.cmd:
-                    self.cmd.stdout.write(".", ending=False)
-                if hasattr(self.model, field.model_field) and field.value:
-                    setattr(self.model, field.model_field, field.value)
+        models_to_save = []
 
-        self.model.save()
+        # migrate local fields
+        for field in self.local_fields.itervalues():
+            if self.cmd:
+                self.cmd.stdout.write(".", ending=False)
+
+            attr_list = field.model_field.split('.')
+            current_object = self.model
+            for index, attr_name in enumerate(attr_list):
+
+                if hasattr(current_object, attr_name):
+                    if index + 1 < len(attr_list):
+                        current_object = getattr(current_object, attr_name)
+                    else:
+                        setattr(current_object, attr_name, field.get_value())
+                        if current_object not in models_to_save:
+                            models_to_save.append(current_object)
+                else:
+                    raise ValueError('No attribute %s.' % attr_name)
+
+        # migrate foreign fields
+        for field in self.foreign_fields.itervalues():
+            if self.cmd:
+                self.cmd.stdout.write(".", ending=False)
+
+            attr_list = field.model_field.split('.')
+            current_object = get_pathway(self.model_class, field.model_class)(self.model)
+            for index, attr_name in enumerate(attr_list):
+
+                if hasattr(current_object, attr_name):
+                    if index + 1 < len(attr_list):
+                        current_object = getattr(current_object, attr_name)
+                    else:
+                        setattr(current_object, attr_name, field.get_value())
+                        if current_object not in models_to_save:
+                            models_to_save.append(current_object)
+                else:
+                    raise ValueError('No attribute %s.' % attr_name)
+
+        # migrate foreign key fields
+        for group, fields in self.fk_fields.iteritems():
+            print('fk to %s' % group)
+            row_data = {}
+            for field in fields:
+                print(field.name)
+                print(field)
+                row_data[field.name] = field.get_value()
+
+            foreign_model = field.foreign_map(row_data).get_model()
+
+            attr_list = field.model_field.split('.')
+            current_object = self.model
+            for index, attr_name in enumerate(attr_list):
+
+                if hasattr(current_object, attr_name):
+                    if index + 1 < len(attr_list):
+                        current_object = getattr(current_object, attr_name)
+                    else:
+                        setattr(current_object, attr_name, foreign_model)
+                        if current_object not in models_to_save:
+                            models_to_save.append(current_object)
+                else:
+                    raise ValueError('No attribute %s.' % attr_name)
+
+
+
+        # after migration save all models
+        # TODO: save the classes model last
+        for updated_model in models_to_save:
+            if hasattr(updated_model, 'save'):
+                print('saving model: %s' % updated_model)
+                updated_model.save()
 
         if self.cmd:
             self.cmd.stdout.write(self.cmd.style.MIGRATE_SUCCESS(" Saved"))
@@ -173,7 +256,9 @@ class TableMap(object):
             model = RecordLink.objects.get(legacy_table=self.table_name,
                                            legacy_pk_field=self._pk_field,
                                            legacy_pk_value=self._pk_value).content_object
-            create_status = self.cmd.style.MIGRATE_HEADING("Found")
+            if self.cmd:
+                create_status = self.cmd.style.MIGRATE_HEADING("Found")
+
         except RecordLink.DoesNotExist:
             model = self.create_model()
             model.save()  # in case model comes unsaved.
