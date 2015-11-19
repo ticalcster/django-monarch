@@ -31,7 +31,7 @@ setup(
     author_email='ticalcster@gmail.com',
     description=DESCRIPTION,
     long_description=read('README.md'),
-    url='https://github.com/jrief/django-websocket-redis',
+    url='https://github.com/ticalcster/django-monarch',
     license='MIT',
     keywords=['django', 'migration'],
     platforms=['OS Independent'],
