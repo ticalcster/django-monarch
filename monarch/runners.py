@@ -31,46 +31,45 @@ class MigrationRunner(object):
             self._cmd.stdout.write(", ".join(self.maps))
 
     def run(self, connection=None):
-        pass
-        # if self.cmd:
-        #     self.cmd.stdout.write(self.cmd.style.MIGRATE_HEADING("Running migrations: "))
-        #
-        # connection_class = None
-        # if connection:
-        #     connection_class = connection
-        # else:
-        #     connection_class = get_connection_class()
-        #
-        # self.connection = connection_class(self.settings, cmd=self.cmd) # JSONConnection(self.settings, cmd=self.cmd)  # Not sure how to configure this
-        #
-        # for table_name in self.tables:
-        #     # Check if it's a valid table
-        #     if not self.monarch_tables.has_key(table_name):
-        #         self.cmd.stdout.write(self.cmd.style.MIGRATE_FAILURE("  No migration model for table %s." % table_name))
-        #         continue
-        #
-        #     table_hash = self.connection.fetch(table=table_name)
-        #
-        #     if table_hash.get('error'):
-        #         if self.cmd:
-        #             self.cmd.stdout.write(self.cmd.style.MIGRATE_FAILURE("  Error: %s." % table_hash['error']))
-        #         continue
-        #
-        #     if not table_hash.get('rows'):
-        #         if self.cmd:
-        #             self.cmd.stdout.write(self.cmd.style.MIGRATE_FAILURE("  No rows for: %s." % table_name))
-        #         continue
-        #
-        #     for row in table_hash['rows']:
-        #         try:
-        #             model_map = self.monarch_tables[table_name](row, cmd=self.cmd)
-        #             model_map.migrate()
-        #         except NoMapPKField, e:
-        #             if self.cmd:
-        #                 self.cmd.stdout.write("%s: %s" % (table_name, self.cmd.style.MIGRATE_FAILURE(e.message)))
-        #
-        # if self.cmd:
-        #     self.cmd.stdout.write(self.cmd.style.MIGRATE_HEADING("Should have done something awesome!"))
+        if self.cmd:
+            self.cmd.stdout.write(self.cmd.style.MIGRATE_HEADING("Running migrations: "))
+
+        connection_class = None
+        if connection:
+            connection_class = connection
+        else:
+            raise ImproperlyConfigured('No connection class given.')
+
+        self.connection = connection_class(self.settings, cmd=self.cmd) # JSONConnection(self.settings, cmd=self.cmd)  # Not sure how to configure this
+
+        for table_name in self.maps:
+            # Check if it's a valid table
+            if not self.monarch_maps.has_key(table_name):
+                self.cmd.stdout.write(self.cmd.style.MIGRATE_FAILURE("  No migration model for table %s." % table_name))
+                continue
+
+            table_hash = self.connection.fetch(table=table_name)
+
+            if table_hash.get('error'):
+                if self.cmd:
+                    self.cmd.stdout.write(self.cmd.style.MIGRATE_FAILURE("  Error: %s." % table_hash['error']))
+                continue
+
+            if not table_hash.get('rows'):
+                if self.cmd:
+                    self.cmd.stdout.write(self.cmd.style.MIGRATE_FAILURE("  No rows for: %s." % table_name))
+                continue
+
+            for row in table_hash['rows']:
+                try:
+                    model_map = self.monarch_maps[table_name](row, cmd=self.cmd)
+                    model_map.migrate()
+                except NoMapPKField, e:
+                    if self.cmd:
+                        self.cmd.stdout.write("%s: %s" % (table_name, self.cmd.style.MIGRATE_FAILURE(e.message)))
+
+        if self.cmd:
+            self.cmd.stdout.write(self.cmd.style.MIGRATE_HEADING("Should have done something awesome!"))
 
     def _get_apps_with_maps(self):
         from django.apps import apps

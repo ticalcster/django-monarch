@@ -4,6 +4,7 @@ from django.core.exceptions import ImproperlyConfigured
 from django.core.management.base import BaseCommand, CommandError
 
 from monarch.runners import MigrationRunner
+from monarch.connectors import HttpJsonConnector
 
 class Command(BaseCommand):
     help = 'Import data from Manager.'
@@ -18,4 +19,5 @@ class Command(BaseCommand):
         monarch_settings = settings.MONARCH_SETTINGS
 
         runner = MigrationRunner(cmd=self)
+        runner.run(connection=HttpJsonConnector)
 
