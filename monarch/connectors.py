@@ -55,7 +55,7 @@ class FileConnectorMixin(object):
 
 class JsonConnectorMixin(object):
     def fetch(self, **kwargs):
-        return json.load(self.fetcher())
+        return json.load(self.fetcher(**kwargs))
 
 
 class ModelConnectorMixin(object):
