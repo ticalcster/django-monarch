@@ -14,7 +14,7 @@ class MigrationRunner(object):
         self.settings = self._get_settings(settings)
         self.apps_with_maps = self._get_apps_with_maps()
         self.monarch_maps = self._get_monarch_maps()
-        self._cmd = cmd
+        self.cmd = cmd
         self.maps = maps
         if not self.maps:
             # Load all know maps if non are given
@@ -23,12 +23,12 @@ class MigrationRunner(object):
         self._init_connectors(self.settings)
 
         # Runner Setup
-        if self._cmd:
-            self._cmd.stdout.write(self._cmd.style.MIGRATE_HEADING("Monarch setup:"))
-            self._cmd.stdout.write(self._cmd.style.MIGRATE_LABEL("  Monarch tables loaded from: "), ending=False)
-            self._cmd.stdout.write(", ".join(self.apps_with_maps))
-            self._cmd.stdout.write(self._cmd.style.MIGRATE_LABEL("  Run migrations for: "), ending=False)
-            self._cmd.stdout.write(", ".join(self.maps))
+        if self.cmd:
+            self.cmd.stdout.write(self.cmd.style.MIGRATE_HEADING("Monarch setup:"))
+            self.cmd.stdout.write(self.cmd.style.MIGRATE_LABEL("  Monarch tables loaded from: "), ending=False)
+            self.cmd.stdout.write(", ".join(self.apps_with_maps))
+            self.cmd.stdout.write(self.cmd.style.MIGRATE_LABEL("  Run migrations for: "), ending=False)
+            self.cmd.stdout.write(", ".join(self.maps))
 
     def run(self, connection=None):
         if self.cmd:
