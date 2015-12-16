@@ -6,8 +6,9 @@ import cStringIO
 
 
 class BaseConnector(object):
-    def __init__(self, settings):
+    def __init__(self, settings, cmd=None):
         self.settings = settings
+        self.cmd = cmd
 
     def fetcher(self):
         raise NotImplementedError
