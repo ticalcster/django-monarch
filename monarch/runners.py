@@ -19,7 +19,7 @@ class MigrationRunner(object):
         if not self.maps:
             # Load all know maps if non are given
             self.maps = self._get_monarch_map_keys()
-
+        self.connection = None
         self._init_connectors(self.settings)
 
         # Runner Setup
@@ -40,7 +40,7 @@ class MigrationRunner(object):
         else:
             raise ImproperlyConfigured('No connection class given.')
 
-        self.connection = connection_class(self.settings['SETTINGS'], cmd=self.cmd) # JSONConnection(self.settings, cmd=self.cmd)  # Not sure how to configure this
+        self.connection = connection_class(self.settings['default']['SETTINGS'], cmd=self.cmd) # JSONConnection(self.settings, cmd=self.cmd)  # Not sure how to configure this
 
         for table_name in self.maps:
             # Check if it's a valid table

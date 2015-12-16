@@ -10,6 +10,8 @@ class BaseConnector(object):
         self.settings = settings
         self.cmd = cmd
 
+        print(self.settings)
+
     def fetcher(self):
         raise NotImplementedError
 

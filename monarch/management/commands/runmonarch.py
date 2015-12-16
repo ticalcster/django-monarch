@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
         if not settings.MONARCH_SETTINGS:
-            raise ImproperlyConfigured('No Monarch settings found.')
+            raise ImproperlyConfigured('No Monarch settings found. See (todo: add url)')
         monarch_settings = settings.MONARCH_SETTINGS
 
         runner = MigrationRunner(cmd=self)
