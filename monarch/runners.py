@@ -40,7 +40,7 @@ class MigrationRunner(object):
         else:
             raise ImproperlyConfigured('No connection class given.')
 
-        self.connection = connection_class(self.settings, cmd=self.cmd) # JSONConnection(self.settings, cmd=self.cmd)  # Not sure how to configure this
+        self.connection = connection_class(self.settings['SETTINGS'], cmd=self.cmd) # JSONConnection(self.settings, cmd=self.cmd)  # Not sure how to configure this
 
         for table_name in self.maps:
             # Check if it's a valid table
