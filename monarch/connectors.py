@@ -42,7 +42,7 @@ class HttpConnectorMixin(object):
         else:
             data = urllib.urlencode(values)
 
-        request = urllib2.Request(self.url, data)
+        request = urllib2.Request(url, data)
         opener = urllib2.build_opener()
         f = opener.open(request)
         return f
