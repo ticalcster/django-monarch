@@ -199,8 +199,8 @@ class TableMap(object):
             # print('fk to %s' % group)
             row_data = {}
             for field in fields:
-                print(field.name)
-                print(field)
+                # print(field.name)
+                # print(field)
                 row_data[field.name] = field.get_value()
 
             foreign_model = field.foreign_map(row_data).get_model()
