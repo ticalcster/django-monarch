@@ -177,8 +177,8 @@ class TableMap(object):
 
         # migrate foreign fields
         for field in self.foreign_fields.itervalues():
-            if self.cmd:
-                self.cmd.stdout.write(".", ending=False)
+            # if self.cmd:
+            #     self.cmd.stdout.write(".", ending=False)
 
             attr_list = field.model_field.split('.')
             current_object = get_pathway(self.model_class, field.model_class)(self.model)
@@ -196,7 +196,7 @@ class TableMap(object):
 
         # migrate foreign key fields
         for group, fields in self.fk_fields.iteritems():
-            print('fk to %s' % group)
+            # print('fk to %s' % group)
             row_data = {}
             for field in fields:
                 print(field.name)
