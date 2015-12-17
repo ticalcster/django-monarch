@@ -110,14 +110,14 @@ class TableMap(object):
                 else:
                     self.local_fields.update(dict_update)
 
-        print('------')
-
-        print('pk', self.pk_fields)
-        print('fk', self.fk_fields)
-        print('local', self.local_fields)
-        print('foreign', self.foreign_fields)
-
-        print('------')
+        # print('------')
+        #
+        # print('pk', self.pk_fields)
+        # print('fk', self.fk_fields)
+        # print('local', self.local_fields)
+        # print('foreign', self.foreign_fields)
+        #
+        # print('------')
 
         # for name, field in self.__class__.__dict__.iteritems():
         #     if isinstance(field, FieldMap):
@@ -225,11 +225,11 @@ class TableMap(object):
         # TODO: save the classes model last
         for updated_model in models_to_save:
             if hasattr(updated_model, 'save'):
-                print('saving model: %s' % updated_model)
+                #print('saving model: %s' % updated_model)
                 updated_model.save()
 
-        if self.cmd:
-            self.cmd.stdout.write(self.cmd.style.MIGRATE_SUCCESS(" Saved"))
+        # if self.cmd:
+        #     self.cmd.stdout.write(self.cmd.style.MIGRATE_SUCCESS(" Saved"))
 
     def get_model_class(self):
         """
@@ -257,7 +257,7 @@ class TableMap(object):
                                            legacy_pk_field=self._pk_field,
                                            legacy_pk_value=self._pk_value).content_object
             if self.cmd:
-                create_status = self.cmd.style.MIGRATE_HEADING("Found")
+                create_status = self.cmd.style.MIGRATE_HEADING("F")
 
         except RecordLink.DoesNotExist:
             model = self.create_model()
@@ -269,17 +269,17 @@ class TableMap(object):
             record_link.content_object = model
             record_link.save()
 
+            if self.cmd:
+                create_status = self.cmd.style.MIGRATE_HEADING("N")
+                # self.cmd.stdout.write(
+                #     "  %(model)s (%(model_pk)s) : %(table)s (%(table_pk)s) " % {'model': model.__class__.__name__,
+                #                                                                 'model_pk': model.pk,
+                #                                                                 'table': self._pk_field,
+                #                                                                 'table_pk': self._pk_value,
+                #                                                                 },
+                #     ending=False)
         if self.cmd:
-            create_status = self.cmd.style.MIGRATE_HEADING("New")
-            self.cmd.stdout.write(
-                "  %(model)s (%(model_pk)s) : %(table)s (%(table_pk)s) " % {'model': model.__class__.__name__,
-                                                                            'model_pk': model.pk,
-                                                                            'table': self._pk_field,
-                                                                            'table_pk': self._pk_value,
-                                                                            },
-                ending=False)
-            if create_status:
-                self.cmd.stdout.write(create_status, ending=False)
+            self.cmd.stdout.write(create_status, ending=False)
 
         return model
 
