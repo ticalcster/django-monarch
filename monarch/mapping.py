@@ -30,21 +30,35 @@ class FieldMap(object):
     name = None  #: Legacy field name
     pk = False  #: Is this field a pk?
     fk = False  #: Is this field a fk?
-    __foreign_map = None
+    foreign_map = None
     converter = None  #: Function to convert the old value to the new value
     model_class = None  #: Model class different from the tables model class
     model_field = None  #: Models field name
     default = None  # todo: not implemented yet
 
     def _get_foreign_map(self):
-        if hasattr(self.__foreign_map, '__call__'):
-            return self.__foreign_map()
+        if isinstance(self.__foreign_map, str):
+            for class_ in TableMap.__subclasses__():
+                if class_.__name__ == self.__foreign_map:
+                    return class_
+            raise NotImplementedError("{0} was not found.".format(self.__foreign_map))
+        print('should not be here')
         return self.__foreign_map
 
     def _set_foreign_map(self, obj):
         self.__foreign_map = obj
 
-    foreign_map = property(_get_foreign_map, _set_foreign_map)  #: TableMap to foreign record
+    _foreign_map = property(_get_foreign_map, _set_foreign_map)
+
+    def __new__(cls, *args, **kwargs):
+        # todo: this should be a meta class.
+        new_cls = super(FieldMap, cls).__new__(cls, *args)
+        new_cls.__foreign_map = new_cls.foreign_map
+        new_cls.foreign_map = new_cls._foreign_map
+
+        return new_cls
+
+    # foreign_map = property(_get_foreign_map, _set_foreign_map)  #: TableMap to foreign record
 
     def __init__(self, value=None):
         self.value = value

@@ -3,6 +3,7 @@ from django.test import TestCase
 from monarch.mapping import FieldMap, field_map
 
 from server.models import Group
+from server.monarch_maps import LegacyGroupMap
 
 
 def convert_to_upper(field_object, value):
@@ -22,6 +23,12 @@ class DummyFieldConvert(FieldMap):
     converter = convert_to_upper
 
 
+class DummyFieldClass(FieldMap):
+    name = 'GroupID'
+    model_field = 'id'
+    foreign_map = 'LegacyGroupMap'
+
+
 class MonarchFieldMapTests(TestCase):
     def setUp(self):
         pass
@@ -37,3 +44,7 @@ class MonarchFieldMapTests(TestCase):
         GroupFieldMap = field_map('GroupID', model_field='id')
         self.assertEqual(GroupFieldMap.model_field, 'id')
 
+    def test_foreign_map_property(self):
+        dummy_field = DummyFieldClass(value='asdf')
+        self.assertEqual(dummy_field.get_value(), 'asdf')
+        self.assertEqual(dummy_field.foreign_map, LegacyGroupMap)

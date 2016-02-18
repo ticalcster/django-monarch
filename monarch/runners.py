@@ -2,7 +2,7 @@
 from django.core.exceptions import ImproperlyConfigured
 from django.utils.module_loading import import_string, import_module
 
-#django <= 1.6 import_by_path
+# django <= 1.6 import_by_path
 # django >= 1.7
 
 from .mapping import TableMap
@@ -40,7 +40,8 @@ class MigrationRunner(object):
         else:
             raise ImproperlyConfigured('No connection class given.')
 
-        self.connection = connection_class(self.settings['default']['SETTINGS'], cmd=self.cmd) # JSONConnection(self.settings, cmd=self.cmd)  # Not sure how to configure this
+        self.connection = connection_class(self.settings['default']['SETTINGS'],
+                                           cmd=self.cmd)  # JSONConnection(self.settings, cmd=self.cmd)  # Not sure how to configure this
 
         for table_name in self.maps:
             # Check if it's a valid table
@@ -70,6 +71,14 @@ class MigrationRunner(object):
 
         if self.cmd:
             self.cmd.stdout.write(self.cmd.style.MIGRATE_HEADING("Should have done something awesome!"))
+            print
+
+    # def _get_monarch_class(self, name):
+    #     monarch_tables = {}
+    #     for class_ in TableMap.__subclasses__():
+    #         if class_.__name__:
+    #             return class_
+    #     raise NotImplementedError("{0} was not found.".format(name))
 
     def _get_apps_with_maps(self):
         from django.apps import apps
