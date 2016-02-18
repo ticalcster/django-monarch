@@ -6,6 +6,7 @@ from django.core.management.base import BaseCommand, CommandError
 from monarch.runners import MigrationRunner
 from monarch.connectors import HttpJsonConnector
 
+
 class Command(BaseCommand):
     help = 'Import data from Manager.'
 
@@ -18,6 +19,6 @@ class Command(BaseCommand):
             raise ImproperlyConfigured('No Monarch settings found. See (todo: add url)')
         monarch_settings = settings.MONARCH_SETTINGS
 
-        runner = MigrationRunner(cmd=self)
+        maps = options.get('tables', None)
+        runner = MigrationRunner(cmd=self, maps=maps)
         runner.run(connection=HttpJsonConnector)
-
