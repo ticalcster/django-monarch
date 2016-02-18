@@ -30,11 +30,21 @@ class FieldMap(object):
     name = None  #: Legacy field name
     pk = False  #: Is this field a pk?
     fk = False  #: Is this field a fk?
-    foreign_map = None  #: TableMap to foreign record
+    __foreign_map = None
     converter = None  #: Function to convert the old value to the new value
     model_class = None  #: Model class different from the tables model class
     model_field = None  #: Models field name
     default = None  # todo: not implemented yet
+
+    def _get_foreign_map(self):
+        if hasattr(self.__foreign_map, '__call__'):
+            return self.__foreign_map()
+        return self.__foreign_map
+
+    def _set_foreign_map(self, obj):
+        self.__foreign_map = obj
+
+    foreign_map = property(_get_foreign_map, _set_foreign_map)  #: TableMap to foreign record
 
     def __init__(self, value=None):
         self.value = value
@@ -219,17 +229,15 @@ class TableMap(object):
                 else:
                     raise ValueError('No attribute %s.' % attr_name)
 
-
-
         # after migration save all models
         # TODO: save the classes model last
         for updated_model in models_to_save:
             if hasattr(updated_model, 'save'):
-                #print('saving model: %s' % updated_model)
+                # print('saving model: %s' % updated_model)
                 updated_model.save()
 
-        # if self.cmd:
-        #     self.cmd.stdout.write(self.cmd.style.MIGRATE_SUCCESS(" Saved"))
+                # if self.cmd:
+                #     self.cmd.stdout.write(self.cmd.style.MIGRATE_SUCCESS(" Saved"))
 
     def get_model_class(self):
         """
