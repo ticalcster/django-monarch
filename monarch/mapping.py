@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
-from copy import copy
-
+import copy
+import six
 from .exceptions import NoMapCreateMethodException, NoMapPKField
 from .models import RecordLink
 
@@ -26,37 +26,36 @@ def get_pathway(have_model, need_model):
     raise IndexError('No pathway for %s to %s' % (have_model.__name__, need_model.__name__))
 
 
-class FieldMap(object):
-    name = None  #: Legacy field name
-    pk = False  #: Is this field a pk?
-    fk = False  #: Is this field a fk?
-    foreign_map = None
-    converter = None  #: Function to convert the old value to the new value
-    model_class = None  #: Model class different from the tables model class
-    model_field = None  #: Models field name
-    default = None  # todo: not implemented yet
-
+class FieldMapMetaclass(type):
     def _get_foreign_map(self):
         if isinstance(self.__foreign_map, str):
             for class_ in TableMap.__subclasses__():
                 if class_.__name__ == self.__foreign_map:
                     return class_
             raise NotImplementedError("{0} was not found.".format(self.__foreign_map))
-        print('should not be here')
         return self.__foreign_map
 
     def _set_foreign_map(self, obj):
         self.__foreign_map = obj
 
+    foreign_map = None
     _foreign_map = property(_get_foreign_map, _set_foreign_map)
 
     def __new__(cls, *args, **kwargs):
-        # todo: this should be a meta class.
-        new_cls = super(FieldMap, cls).__new__(cls, *args)
-        new_cls.__foreign_map = new_cls.foreign_map
-        new_cls.foreign_map = new_cls._foreign_map
+        new_class = super(FieldMapMetaclass, cls).__new__(cls, *args, **kwargs)
+        new_class.__foreign_map = new_class.foreign_map
+        new_class.foreign_map = new_class._foreign_map
+        return new_class
 
-        return new_cls
+
+class FieldBaseMap(object):
+    name = None  #: Legacy field name
+    pk = False  #: Is this field a pk?
+    fk = False  #: Is this field a fk?
+    converter = None  #: Function to convert the old value to the new value
+    model_class = None  #: Model class different from the tables model class
+    model_field = None  #: Models field name
+    default = None  # todo: not implemented yet
 
     # foreign_map = property(_get_foreign_map, _set_foreign_map)  #: TableMap to foreign record
 
@@ -70,6 +69,10 @@ class FieldMap(object):
         if self.converter and hasattr(self.converter, '__call__'):
             return self.converter(self.value)
         return self.value
+
+
+class FieldMap(six.with_metaclass(FieldMapMetaclass, FieldBaseMap)):
+    pass
 
 
 def field_map(name, pk=False, fk=False, foreign_map=None, converter=None,
@@ -110,7 +113,7 @@ class TableMap(object):
         for field in self.fields:
             # if not field.model_field:
             #     field.model_field = str(field.name)
-            instance_field = copy(field)(row.get(field.name, field.default))
+            instance_field = copy.deepcopy(field)(row.get(field.name, field.default))
 
             # add to pk list
             if field.pk:
